@@ -1,6 +1,10 @@
-# AngularFileMd5
+# Angular File MD5
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.6.
+
+## Demo
+
+[Click here](https://codewarrior404.github.io/angular-file-md5/) for demo.
 
 ## Development server
 
