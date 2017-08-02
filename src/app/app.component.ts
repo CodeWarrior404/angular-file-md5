@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Md5HashService } from './md5-hash/md5-hash.service';
 
 @Component({
@@ -8,9 +8,12 @@ import { Md5HashService } from './md5-hash/md5-hash.service';
 })
 export class AppComponent implements OnInit {
   selectedFile: File;
+  progressPercent = 0;
+  md5Checksum: string;
 
   constructor(
-    private md5HashService: Md5HashService
+    private md5HashService: Md5HashService,
+    private changeDetectorRef: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -18,6 +21,18 @@ export class AppComponent implements OnInit {
 
   fileSelectionChangeHandler(event): void {
     this.selectedFile = event.srcElement.files[0];
-    this.md5HashService.generateMD5HashForFile(this.selectedFile);
+    this.md5HashService.generateMD5HashForFile(this.selectedFile)
+      .subscribe(data => {
+        switch (data.type) {
+          case 'status':
+            console.log(data.message + '%');
+            this.progressPercent = data.message;
+            break;
+          case 'checksum':
+            this.md5Checksum = data.message;
+            break;
+        }
+        this.changeDetectorRef.detectChanges();
+      });
   }
 }

@@ -12,7 +12,15 @@ export class Md5HashService {
     const hashWorker = new Worker('assets/scripts/md5HashWebWorker.js');
 
     hashWorker.onmessage = function (event) {
-      console.log(event);
+      switch (event.data.type) {
+        case 'status':
+          hashSubject.next(event.data);
+          break;
+        case 'checksum':
+          hashSubject.next(event.data);
+          hashSubject.complete();
+          break;
+      }
     };
 
     hashWorker.postMessage([file]);
