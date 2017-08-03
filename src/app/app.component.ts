@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Md5HashService } from './md5-hash/md5-hash.service';
+import { Subscription } from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-root',
@@ -10,6 +11,7 @@ export class AppComponent implements OnInit {
   selectedFile: File;
   progressPercent = 0;
   md5Checksum: string;
+  hashSubscription: Subscription;
 
   constructor(
     private md5HashService: Md5HashService,
@@ -21,11 +23,10 @@ export class AppComponent implements OnInit {
 
   fileSelectionChangeHandler(event): void {
     this.selectedFile = event.srcElement.files[0];
-    this.md5HashService.generateMD5HashForFile(this.selectedFile)
+    this.hashSubscription = this.md5HashService.generateMD5HashForFile(this.selectedFile)
       .subscribe(data => {
         switch (data.type) {
           case 'status':
-            console.log(data.message + '%');
             this.progressPercent = data.message;
             break;
           case 'checksum':
@@ -34,5 +35,12 @@ export class AppComponent implements OnInit {
         }
         this.changeDetectorRef.detectChanges();
       });
+  }
+
+  cancelClickHandler(): void {
+    this.md5HashService.terminateMD5HashGeneration();
+    if (this.hashSubscription) {
+      this.hashSubscription.unsubscribe();
+    }
   }
 }
