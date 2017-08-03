@@ -1,6 +1,6 @@
 // https://www.codeproject.com/Articles/830704/Gigabit-File-uploads-Over-HTTP
 // MD5 checksum library https://github.com/satazor/SparkMD5
-importScripts('spark-md5.js');
+importScripts('spark-md5.min.js');
 
 var BYTES_PER_CHUNK = 1024 * 1024; // 1 MB chunk sizes
 
