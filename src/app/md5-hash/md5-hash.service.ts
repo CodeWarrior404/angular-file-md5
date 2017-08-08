@@ -4,7 +4,7 @@ import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class Md5HashService {
-  hashWorker: Worker;
+  hashWorkers: Worker[] = [];
 
   constructor() { }
 
@@ -13,9 +13,10 @@ export class Md5HashService {
     const webWorkerScriptBlob = new Blob([this.getWorkerScriptAsString()]);
     const webWorkerScriptBlobURL = window.URL.createObjectURL(webWorkerScriptBlob);
 
-    this.hashWorker = new Worker(webWorkerScriptBlobURL);
+    const hashWorker = new Worker(webWorkerScriptBlobURL);
+    this.hashWorkers.push(hashWorker);
 
-    this.hashWorker.onmessage = event => {
+    hashWorker.onmessage = event => {
       switch (event.data.type) {
         case 'status':
           hashSubject.next(event.data);
@@ -27,13 +28,18 @@ export class Md5HashService {
       }
     };
 
-    this.hashWorker.postMessage([file]);
+    hashWorker.postMessage([file]);
     return hashSubject.asObservable();
   }
 
-  terminateMD5HashGeneration(): void {
-    if (this.hashWorker) {
-      this.hashWorker.terminate();
+  terminateAllMD5HashGenerationWorkers(): void {
+    if (this.hashWorkers && this.hashWorkers.length > 0) {
+      for (const hashWorker of this.hashWorkers) {
+        if (hashWorker) {
+          hashWorker.terminate();
+        }
+      }
+      this.hashWorkers = [];
     }
   }
 

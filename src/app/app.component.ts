@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
   }
 
   cancelClickHandler(): void {
-    this.md5HashService.terminateMD5HashGeneration();
+    this.md5HashService.terminateAllMD5HashGenerationWorkers();
     if (this.hashSubscription) {
       this.hashSubscription.unsubscribe();
     }
